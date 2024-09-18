@@ -2,8 +2,9 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import time
+import re  # Import regex module
 
-# List of URLs to scrape
+# List of URLs to scrape (combining both part 1 and part 2)
 urls = [
     "https://onepiece.limitlesstcg.com/cards/misc-promos?display=text",
     "https://onepiece.limitlesstcg.com/cards/prize-cards?display=text",
@@ -79,6 +80,13 @@ urls = [
 # Initialize an empty list to hold all the card data
 all_cards = []
 
+# Function to extract numbers using regex
+def extract_number(text, keyword):
+    match = re.search(r'(\d+)\s*' + keyword, text)
+    if match:
+        return match.group(1)
+    return None
+
 # Loop through each URL and scrape data
 for url in urls:
     print(f"Scraping {url}...")
@@ -95,7 +103,7 @@ for url in urls:
         card_id = card.find('span', class_='card-text-id').get_text(strip=True)
         category = card.find('span', {'data-tooltip': 'Category'}).get_text(strip=True) if card.find('span', {'data-tooltip': 'Category'}) else 'No Category'
         color = card.find('span', {'data-tooltip': 'Color'}).get_text(strip=True) if card.find('span', {'data-tooltip': 'Color'}) else 'No Color'
-        attribute = card.find('span', {'data-tooltip': 'Attribute'}).get_text(strip=True) if card.find('span', {'data-tooltip': 'Attribute'}) else 'No Attribute'
+        attribute = card.find('span', {'data-tooltip': 'Attribute'}).get_text(strip=True) if card.find('span', {'data-tooltip': 'Attribute'}) else 'null'
 
         # Initialize life, power, counter, and cost
         life = None
@@ -107,11 +115,15 @@ for url in urls:
         type_section = card.find('p', class_='card-text-type')
         if type_section:
             type_text = type_section.get_text(strip=True)
-            # Extracting life or cost from the end of the 'card-text-type' content
-            if 'Life' in type_text:
-                life = type_text.split('Life')[-1].split('•')[0].strip()
-            elif 'Cost' in type_text:
-                cost = type_text.split('Cost')[-1].split('•')[0].strip()
+            # Use regex to find the life and cost
+            life = extract_number(type_text, 'Life')
+            cost = extract_number(type_text, 'Cost')
+
+        # Logic to set "null" for cost and life based on the category
+        if category == "Leader":
+            cost = 'null'  # Leaders have "null" cost
+        elif category in ['Character', 'Event', 'Stage']:
+            life = 'null'  # Characters, Events, and Stages have "null" life
 
         # Power and attributes
         power_section = card.find('p', class_='card-text-section')
@@ -128,11 +140,15 @@ for url in urls:
         if category in ['Event', 'Stage'] and not power:
             power = 'null'
 
-        # Ability Text
+        # Extract the ability text from the second <div class="card-text-section">
         ability_text_sections = card.find_all('div', class_='card-text-section')
-        ability_text = ability_text_sections[-1].get_text(strip=True) if ability_text_sections else 'No Ability Text'
+        ability_text = "null"
+        if len(ability_text_sections) > 2:
+            # The second <div> should have the ability text
+            ability_text = ability_text_sections[1].get_text(strip=True) or "null"
 
-        card_type = card.find('span', {'data-tooltip': 'Type'}).get_text(strip=True) if card.find('span', {'data-tooltip': 'Type'}) else 'No Type'
+        # Extract card type (last <div class="card-text-section">)
+        card_type = ability_text_sections[-1].get_text(strip=True) if len(ability_text_sections) > 1 else 'No Type'
 
         # Append the extracted data to the list
         cards.append([name, card_id, category, color, attribute, life, power, counter, cost, ability_text, card_type])
