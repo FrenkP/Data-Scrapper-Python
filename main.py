@@ -45,6 +45,7 @@ urls = [
     "https://onepiece.limitlesstcg.com/cards/tournament-pack-08?display=text",
     "https://onepiece.limitlesstcg.com/cards/event-pack-05?display=text",
     "https://onepiece.limitlesstcg.com/cards/regional-participation-pack-2024-3?display=text",
+    "https://onepiece.limitlesstcg.com/cards/tournament-pack-09",
     "https://onepiece.limitlesstcg.com/cards/st01-straw-hat-crew?display=text",
     "https://onepiece.limitlesstcg.com/cards/st02-worst-generation?display=text",
     "https://onepiece.limitlesstcg.com/cards/st03-the-seven-warlords-of-the-sea?display=text",
@@ -74,6 +75,7 @@ urls = [
     "https://onepiece.limitlesstcg.com/cards/eb01-memorial-collection?display=text",
     "https://onepiece.limitlesstcg.com/cards/op07-500-years-in-the-future?display=text",
     "https://onepiece.limitlesstcg.com/cards/op08-two-legends?display=text",
+    "https://onepiece.limitlesstcg.com/cards/prb01-premium-booster-one-piece-the-best",
     "https://onepiece.limitlesstcg.com/cards/op09-emperors-in-the-new-world?display=text"
 ]
 
